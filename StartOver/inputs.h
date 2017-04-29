@@ -64,10 +64,6 @@ void handleInput(){
       }
     }
   }
-
-  arduboy.setCursor(0,0);
-  arduboy.drawPixel((levelX+64)-levelX, 32);
-
   
   //Run
   if(arduboy.pressed(A_BUTTON)){

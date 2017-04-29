@@ -12,5 +12,20 @@ struct Player{
   
 };
 
+struct Droplet{
+  unsigned char x;
+  short y;
+};
+
+struct Cloud{
+  short x;
+  signed char y;
+};
+
+struct Star{
+  short x;
+  signed char y;
+};
+
 #endif
 

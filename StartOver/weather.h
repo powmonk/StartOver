@@ -2,22 +2,11 @@
 #define WEATHER_H
 #include "Arduboy2.h"
 #include "globals.h"
+#include "entities.h"
 
 Arduboy2 arduboy;
 Sprites sprites;
 
-short xSeed; 
-short ySeed=99;
-short localLevelX;
-const byte showerSize = 20;
-
-
-struct Droplet{
-  byte x;
-  short y;
-};
-
-struct Droplet drop[showerSize];
 
 
 void droplet(byte x, byte y){
@@ -28,48 +17,66 @@ void droplet(byte x, byte y){
   }
 }
 
-void shower(){
+void rain(){
 
-
-  if(ySeed == 99){
+  if(initTrigger){
      for(byte i=0;i<showerSize;i++){
       drop[i].x = random(180)-25;
-      drop[i].y = random(120)+63;
+      drop[i].y = random(120)-63;
     }
-    ySeed = -16;
   }
-
-//  ((levelX+64)-levelX, 32)
 
   for(byte i=0;i<showerSize;i++){
     if(drop[i].y > 63 || drop[i].x < 0 || drop[i].x > 180){
       drop[i].y = -64;
-      drop[i].x = random(180);
+      drop[i].x = levelX+random(180);
     }else{
       drop[i].y+=3;
       drop[i].x--;
     }
-//    drop[i].x-=levelX/1024;
-
-
     droplet(drop[i].x, drop[i].y);
   }
 
-  arduboy.setCursor(0,0);
-  arduboy.print(32-levelX);
+}
 
-  
+void clouds(){
+  if(initTrigger){
+   for(byte i=0;i<cloudCount;i++){
+       cloudArray[i].x = random(512);
+       cloudArray[i].y = random(24) - 5;
+    }
+  }
+
+  for(short i=0;i<cloudCount;i++){
+    if(cloudArray[i].x*0.3 < -64){
+       cloudArray[i].x = 512;
+       cloudArray[i].y = random(24);
+    }
+
+    cloudArray[i].x--;
+
+//    cloudArray[i].x = levelX + cloudArray[i].x;
+    if(cloudArray[i].x*0.3 > -32 || cloudArray[i].x*0.3  < 128){
+      arduboy.drawBitmap(cloudArray[i].x*0.3, cloudArray[i].y,cloud,30,10,1);
+    }
+  }
 }
 
 
-void rain(short levelX){
-  localLevelX = levelX;
-  shower();
-}
+void stars(){
+    if(initTrigger){
+      for(byte i=0;i<starCount;i++){
+        starArray[i].x = random(512); 
+        starArray[i].y = random(32); 
+      }
+    }
 
-struct Cloud{
-  byte x;
-  byte y;
-};
+    for(byte i=0;i<starCount;i++){
+      if(levelX+starArray[i].y > 0 || levelX+starArray[i].y < 128){
+        arduboy.drawPixel(levelX/5+starArray[i].x, starArray[i].y);
+      }
+    }
+    
+}
 
 #endif

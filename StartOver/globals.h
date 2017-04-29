@@ -15,10 +15,18 @@ short levelX = 0;
 byte playerX = 20;
 byte playerY =  0;
 byte jumpHeight;
-short cloudCount =-200;
 char screenTiles[17][8];
 byte floorLevel;
-short cloudX = 500;
+bool initTrigger = 1;
+static const byte levelHeight = 8;
+static const byte levelWidth  = sizeof(levelMap[0]);
+const byte starCount = (levelWidth/5);
+const char showerSize = 10;
+const char cloudCount = 3;
+
+struct Droplet drop[showerSize];
+struct Cloud cloudArray[cloudCount];
+struct Star starArray[starCount];
 
 bool getSolid(short y, short x){
   

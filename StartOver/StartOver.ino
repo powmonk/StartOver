@@ -24,36 +24,36 @@ void setup() {
 short x = 0;
 short y = 0;
 
-
-static const byte levelHeight = 8;
-static const byte levelWidth  = sizeof(levelMap[0]);
-
-
-
-
 void drawStreetLight(short lightX){
   arduboy.fillRect((lightX+levelX+29), 25, 3, 3, 1);
 
-  arduboy.drawFastVLine((lightX+levelX)+24, 26,30,0);
   arduboy.drawFastVLine((lightX+levelX)+25, 26,30,1);
   arduboy.drawFastHLine((lightX+levelX)+26, 26,3,1);
   
   if(arduboy.everyXFrames(random(13))){
     arduboy.fillTriangle((lightX+levelX)+19, 56, (lightX+levelX)+54, 56, (lightX+levelX)+30, 25, 1);
+    arduboy.drawFastVLine((lightX+levelX)+24, 26,30,0);
+    arduboy.drawFastVLine((lightX+levelX)+29, 25,3,0);
+  }else{
+    arduboy.drawFastVLine((lightX+levelX)+24, 26,30,1);
+    arduboy.drawFastVLine((lightX+levelX)+29, 25,3,1);
   }
-  
 }
 
 void drawLevel(){
   byte arrayX = levelX / -8;
 
-  short scrollRate = levelX/2.3; 
+  short scrollRate = levelX/2.5; 
   int tile1=0;
   int tile2=128;
 
   tile1 = scrollRate+tile1<= -128?tile1+=256:tile1;
   tile2 = scrollRate+tile2<= -128?tile2+=256:tile2;
 
+
+  struct Skyline{
+    int x;
+  };
   
   if(arduboy.everyXFrames(2)){
     sprites.drawSelfMasked(0,-24,sky, 0);
@@ -83,10 +83,10 @@ void drawLevel(){
     }
   }
 
-  drawStreetLight(85);
-  drawStreetLight(260);
-  drawStreetLight(480);
-  drawStreetLight(660);
+  drawStreetLight(levelWidth*8 / 5 * 1);
+  drawStreetLight(levelWidth*8 / 5 * 2);
+  drawStreetLight(levelWidth*8 / 5 * 3);
+  drawStreetLight(levelWidth*8 / 5 * 4);
 }
 
 void drawPlayer(){
@@ -128,48 +128,33 @@ void loop() {
   // first we clear our screen to black
   arduboy.clear();
 
-//  if(arduboy.everyXFrames(2))
+  stars();
+
+
+  arduboy.fillCircle(levelX/5+160,y+15, 12, 1);
+
+  arduboy.fillCircle(levelX/5+154,y+12, 11, 0);
+
+  if(arduboy.everyXFrames(2)){
     arduboy.fillCircle(levelX/5+160,y+15, 12, 1);
+  }
 
-  arduboy.fillCircle(levelX/5+155,y+11, 10, 0);
-
-    cloudX -= 0.0005;
-//    if(arduboy.everyXFrames(2)){
-      arduboy.drawBitmap(cloudX,-1,cloud,30,10,1);
-      arduboy.drawBitmap(cloudX-230,10,cloud,30,10,1);
-      arduboy.drawBitmap(cloudX+100,15,cloud,30,10,1);
-      arduboy.drawBitmap(cloudX+300,20,cloud,30,10,1);
-//    }
-
-  
-    if(cloudX<=-30 || cloudX == 0)
-      cloudX = 800;
+  clouds();
 
   drawLevel();
 
 
   handleInput();
 
-
-
-//  droplet(10);
-
-//  if(tick%2==0){
-////    arduboy.fillCircle((levelX/3+160)+31, y, 31, WHITE);
-//    arduboy.drawBitmap(levelX/3+160,y-30,sun1,64,64,1);
-//  }else{
-//    arduboy.drawBitmap(levelX/3+160,y-30,sun0,64,64,1);
-//  }
-
-
   drawPlayer();
 
-  rain(levelX);
+  rain();
 
   levelX = levelX>0?0:levelX;
   levelX = levelX<0-(levelWidth*8-128)?0-(levelWidth*8-128):levelX;
 
   tick++;
+  initTrigger = 0;
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
