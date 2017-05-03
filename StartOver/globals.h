@@ -1,42 +1,166 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "entities.h"
-#include "globals.h"
+#define PIXEL_SAFE_MODE
 
-bool face = true;
-bool walk = false;
-bool crouch = false;
-bool falling = true;
-bool jump = false;
-bool run;
-byte frame = 0;
+#include "Arduboy2.h"
+#include "entities.h"
+#include "environment.h"
+#include "bitmaps.h"
+
+
+
+Arduboy2 arduboy;
+Sprites sprites;
+
 short levelX = 0;
-byte playerX = 20;
-byte playerY =  0;
-byte jumpHeight;
 char screenTiles[17][8];
-byte floorLevel;
+char coinFrame = 0;
 bool initTrigger = 1;
-static const byte levelHeight = 8;
-static const byte levelWidth  = sizeof(levelMap[0]);
-const byte starCount = (levelWidth/5);
+const byte starCount = 100;
 const char showerSize = 10;
 const char cloudCount = 3;
+int levelWidth = sizeof(levelMap[8]);
+
+
+struct Droplet{
+  short x;
+  short y;
+};
+
+struct Cloud{
+  short x;
+  signed char y;
+};
+
+struct Star{
+  short x;
+  signed char y;
+};
+
+
+struct Background{
+  signed short x;
+};
 
 struct Droplet drop[showerSize];
 struct Cloud cloudArray[cloudCount];
 struct Star starArray[starCount];
+struct Background skyline;
 
-bool getSolid(short y, short x){
-  
-  char temp = pgm_read_byte(&(levelMap[(byte)x/8][(byte)y/8]));
-  if(temp!=0){
+// This method returns a boolean solid/not solid for the foreground
+// and takes x/y co-ords as parameters.
+bool getSolid(short x, short y){
+  x/=8;
+  y/=8;
+
+  char temp = pgm_read_byte( & (levelMap[y][x]) );
+
+  if(temp>0){
+    return true;
+  }
+  return false;
+}
+bool getCoinBox(short x, short y){
+  x/=8;
+  y/=8;
+
+  char temp = pgm_read_byte( & (levelMap[y][x]) );
+
+  if(temp==3){
     return true;
   }
   return false;
 }
 
-Player badface;
+
+//PLAYER STRUCT
+
+struct Player{
+  byte x;
+  int y;
+  byte frame;
+  int ceiling;
+  byte xSpeed;
+  bool alive;
+  bool xDirection;
+  bool falling;
+  bool jumping;
+  bool crouching;
+  
+};
+
+struct Player badMan;
+
+void playerInit(){
+  badMan.x          = 20;
+  badMan.y          = 0;
+  badMan.frame      = 0;
+  badMan.xDirection = 1;
+  badMan.falling    = true;
+  badMan.jumping    = false;
+  badMan.alive      = true;
+}
+
+void drawPlayer(){
+  char death=64;
+  if(badMan.alive){
+    if(badMan.xDirection){
+      sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, badMan.frame);
+    }else{
+      sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceLeft, badMan.frame);
+    }
+  }else{
+    if(arduboy.everyXFrames(2)){
+      sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, 0);
+    }
+  }
+}
+
+void coinRotate(signed char x, signed char y){
+  
+  sprites.drawSelfMasked(x,y-2,coinAnim,coinFrame);
+  
+  if(arduboy.everyXFrames(10)){
+    coinFrame++;
+  }
+  if(coinFrame >= 3){
+    coinFrame = 0;
+  }
+
+}
+
+///
+
+void coinBoxAnim(char x, char y){
+  bool done = false;
+  
+//  while(!done){
+//    if(!getSolid(x,y)){
+//      x++;
+//      done = true;
+//      break;
+//    }
+//    x--;
+//  }
+//
+//  done = false;
+//  
+//  while(!done){
+//    if(!getSolid(x,y)){
+//      y-=17;
+//      done = true;
+//      break;
+//    }
+//    y--;
+//  }
+  x/=8;
+  y/=8;
+  x*=8;
+  y*=8;
+  coinRotate(x+64, y-8);  
+  
+}
+
 #endif
 
