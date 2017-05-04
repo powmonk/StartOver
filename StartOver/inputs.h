@@ -3,17 +3,22 @@
 #include "globals.h"
 
 bool crawl = false;
+bool deadBool = false;
 unsigned char gameOverY=70;
 
 void handleInput(){  
 //  arduboy.print(getSolid((badMan.x-1)-levelX,badMan.y+10));
   arduboy.print(badMan.alive);
   
+//if(initTrigger){
+//  badMan.alive = true;
+//}
+
   
 if(badMan.alive){  
-    if(!getSolid((badMan.x + 1)-levelX, badMan.y+17) && !getSolid((badMan.x + 5)-levelX, badMan.y+17) && !badMan.jumping){
+    if(!getSolid((badMan.x + 1)-levelX, badMan.y+17) && !getSolid((badMan.x + 5)-levelX, badMan.y+17) && !badMan.jumping  || !getSolid((badMan.x+3)-levelX, badMan.y+17) && !badMan.jumping){
       badMan.falling=true;
-  //    badMan.jumping=false;
+      badMan.jumping=false;
     }else{
       badMan.falling=false;
     }
@@ -28,15 +33,21 @@ if(badMan.alive){
     }
   
     if(badMan.falling){
-      badMan.y+=2;
+        badMan.y += 2;
     }
+    if(!getSolid((badMan.x + 6)-levelX, badMan.y+16) && !getSolid((badMan.x)-levelX, badMan.y+16) && !badMan.jumping){
+        badMan.y += 1;
+    }
+
   
     if(!badMan.falling && badMan.xSpeed != 0){
       if(arduboy.everyXFrames(4)){
         if(badMan.frame<3){
           badMan.frame++;
         }else{
-          badMan.frame=0;
+          if(!badMan.crouching){
+            badMan.frame=0;
+          }
           badMan.xSpeed = 0;
         }
       }
@@ -44,7 +55,7 @@ if(badMan.alive){
   
   
     // Move right
-    if(arduboy.pressed(RIGHT_BUTTON) && !getSolid((badMan.x+5)-levelX, badMan.y+10)  && !badMan.crouching && badMan.x<levelWidth*8){
+    if(arduboy.pressed(RIGHT_BUTTON) && !getSolid((badMan.x+5)-levelX, badMan.y+7) && !getSolid((badMan.x+5)-levelX, badMan.y+10) && !badMan.crouching && badMan.x<levelWidth*8){
   
       if(!arduboy.pressed(A_BUTTON)){
         badMan.xSpeed=1;
@@ -58,7 +69,7 @@ if(badMan.alive){
     }
   
     // Move left
-    if(arduboy.pressed(LEFT_BUTTON) && !getSolid((badMan.x)-levelX, badMan.y+10) && !badMan.crouching && badMan.x>0){
+    if(arduboy.pressed(LEFT_BUTTON) && !getSolid((badMan.x)-levelX, badMan.y+7) && !getSolid((badMan.x)-levelX, badMan.y+10) && !badMan.crouching && badMan.x>0){
   
       if(!arduboy.pressed(A_BUTTON)){
         badMan.xSpeed=1;
@@ -84,11 +95,19 @@ if(badMan.alive){
       }else if(badMan.frame = 4){
         badMan.frame = 5;  
       }
-  
+    }else{
+      if(!getSolid((badMan.x+3)-levelX, badMan.y+4)){
+        badMan.crouching = false;
+      }
+      
+    }
+
+    //Crawling
+    if(badMan.crouching){
+      
       if(arduboy.everyXFrames(16)){
         crawl = !crawl;
       }
-      
       if(arduboy.pressed(RIGHT_BUTTON) && !getSolid((badMan.x+5)-levelX, badMan.y+15)  && badMan.x<levelWidth*8 ){
         if(crawl){
           badMan.xSpeed = 1;
@@ -114,34 +133,25 @@ if(badMan.alive){
         badMan.xDirection = false;
   
       }
-  
-      
-      
-    }else{
-      badMan.crouching = false;
-      
     }
   
     if(badMan.x>64 && levelX > -levelWidth*8+128){
       levelX   -=badMan.xSpeed;
       badMan.x -=badMan.xSpeed;
     }
-  
-    arduboy.setCursor(0,8);
-    arduboy.print(0-(levelWidth*8)-64);
-  
+    
   
    if(badMan.x<64 && levelX<0){
       levelX   +=badMan.xSpeed;
       badMan.x +=badMan.xSpeed;
     }
     
-    if(arduboy.pressed(B_BUTTON) && !badMan.jumping && !badMan.falling && !badMan.crouching){
+    if(arduboy.pressed(B_BUTTON) && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
       badMan.jumping = true;
       badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
     }
   
-    if(badMan.jumping){
+    if(badMan.jumping && !badMan.falling && !badMan.crouching){
       if(badMan.y>badMan.ceiling){
         badMan.y-=3;
       }else{
@@ -151,14 +161,37 @@ if(badMan.alive){
       
     }
   }else{
-    if(arduboy.everyXFrames(2) && gameOverY>20 && badMan.y<5){
+    if(arduboy.pressed(LEFT_BUTTON) && deadBool == 1 || arduboy.pressed(RIGHT_BUTTON) && deadBool == 0 && gameOverY==10){
+      deadBool = !deadBool;
+    }
+    
+    if(arduboy.everyXFrames(2) && gameOverY>10 && badMan.y<5){
       gameOverY--;
     }
-    arduboy.drawBitmap(0,gameOverY-3, gameOverBG, 128, 23, 0);
-    sprites.drawSelfMasked(4,gameOverY,gameOver,0);
-    badMan.y--;
+    arduboy.drawBitmap(0,gameOverY-1, gameOverBG, 128, 23, 0);
+    arduboy.drawBitmap(24,gameOverY+25, yesNoBG, 81, 16, 0);
+
+    arduboy.drawBitmap(81, gameOverY+25,  no, 24, 12, deadBool);
+    arduboy.drawBitmap(24, gameOverY+25, yes, 34, 16, !deadBool);
+    
+    sprites.drawSelfMasked(0,gameOverY-1,gameOver,0);
+
+    if(arduboy.pressed(B_BUTTON) && !deadBool && gameOverY==10){
+      levelX=0;
+//      badMan.x=20;
+//      badMan.y=0;
+////      badMan.alive = true; 
+//      badMan.xDirection = true;
+      playerInit();
+      gameOverY = 70; 
+      initTrigger = 1;
+    }
+
+    if(badMan.y > 0-16){
+      badMan.y--;
+    }
   }
-  if(badMan.y>=64-16){
+  if(badMan.y>64-16){
     badMan.alive = false;
   }
 

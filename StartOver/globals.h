@@ -77,11 +77,11 @@ bool getCoinBox(short x, short y){
 //PLAYER STRUCT
 
 struct Player{
-  byte x;
-  int y;
+  short x;
+  short y;
   byte frame;
   int ceiling;
-  byte xSpeed;
+  char xSpeed;
   bool alive;
   bool xDirection;
   bool falling;
@@ -103,8 +103,23 @@ void playerInit(){
 }
 
 void drawPlayer(){
-  char death=64;
   if(badMan.alive){
+    if(badMan.frame<5){
+      arduboy.drawFastHLine(badMan.x+1,badMan.y+9,4,0);
+      arduboy.drawFastHLine(badMan.x+1,badMan.y+10,4,0);
+    }
+    
+    if(badMan.frame==5){
+      arduboy.drawFastHLine(badMan.x+1,badMan.y+13,4,0);
+    }
+
+    if(badMan.frame==7){
+      arduboy.drawFastHLine(badMan.x+badMan.xDirection*2,badMan.y+13,4,0);
+    }
+
+
+    
+
     if(badMan.xDirection){
       sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, badMan.frame);
     }else{
