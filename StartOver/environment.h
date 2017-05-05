@@ -3,7 +3,9 @@
 #include "globals.h"
 #include "entities.h"
 
-
+char rainSize;
+signed short skyTile0;
+signed short skyTile1;
 
 
 void droplet(byte x, byte y){
@@ -15,21 +17,24 @@ void droplet(byte x, byte y){
 }
 
 void rain(){
+  rainSize = random(showerSize);
 
+  wind = arduboy.everyXFrames(500)?1-random(2):wind;
+  
   if(initTrigger){
-     for(byte i=0;i<showerSize;i++){
-      drop[i].x = random(180)-25;
-      drop[i].y = random(120)-63;
+     for(byte i=0;i<rainSize;i++){
+      drop[i].x = 180-random(260);
+      drop[i].y = 64-random(72)-63;
     }
   }
 
-  for(byte i=0;i<showerSize;i++){
-    if(drop[i].y > 63 || drop[i].x < 0 || drop[i].x > 180){
-      drop[i].y = -64;
+  for(byte i=0;i<rainSize;i++){
+    if(drop[i].y > 65 || drop[i].x < -60 || drop[i].x > 180){
+      drop[i].y = -32;
       drop[i].x = random(180);
     }else{
       drop[i].y+=3;
-      drop[i].x--;
+      drop[i].x = wind != 0?drop[i].x+=wind:drop[i].x;
     }
     droplet(drop[i].x, drop[i].y);
   }
@@ -70,51 +75,101 @@ void stars(){
 
     for(byte i=0;i<starCount;i++){
       if(levelX+starArray[i].y > 0 || levelX+starArray[i].y < 128){
-        arduboy.drawPixel(levelX/5+starArray[i].x, starArray[i].y);
+        arduboy.drawPixel(levelX/8+starArray[i].x, starArray[i].y);
       }
     }
 }
 
 void drawStreetLight(short lightX){
-  arduboy.fillRect((lightX+levelX+29), 25, 3, 3, 1);
+  arduboy.fillRect((lightX+levelX+29), 24, 5, 4, 1);
+  arduboy.fillRect((lightX+levelX+30), 22, 3, 3, 1);
 
   arduboy.drawFastVLine((lightX+levelX)+25, 26,30,1);
   arduboy.drawFastHLine((lightX+levelX)+26, 26,3,1);
   
   if(arduboy.everyXFrames(random(13))){
-    arduboy.fillTriangle((lightX+levelX)+19, 56, (lightX+levelX)+54, 56, (lightX+levelX)+30, 25, 1);
+    arduboy.fillTriangle((lightX+levelX)+19, 56, (lightX+levelX)+54, 56, (lightX+levelX)+30, 22, 1);
+//    arduboy.fillTriangle((lightX+levelX)+19, 56, (lightX+levelX)+54, 56, (lightX+levelX)+30, 25, 1);
     arduboy.drawFastVLine((lightX+levelX)+24, 26,30,0);
-    arduboy.drawFastVLine((lightX+levelX)+29, 25,3,0);
+    arduboy.drawFastVLine((lightX+levelX)+29, 24,4,0);
   }else{
+//    arduboy.drawBitmap(lightX+levelX+16, 29,  castLight, 33, 33, 1);
     arduboy.drawFastVLine((lightX+levelX)+24, 26,30,1);
     arduboy.drawFastVLine((lightX+levelX)+29, 25,3,1);
   }
 }
 
 void drawSkyline(){  
+  if(initTrigger){
+      skyTile0 = 0;
+      skyTile0 = -128;
+  }
   
   short scrollRate = levelX/2.5; 
-  int tile1=0;
-  int tile2=128;
 
-  tile1 = scrollRate+tile1<= -128?tile1+=256:tile1;
-  tile2 = scrollRate+tile2<= -128?tile2+=256:tile2;
-  
-  arduboy.drawBitmap(scrollRate+tile1,14,skyLine,128,28,0);
-  arduboy.drawBitmap(scrollRate+tile2,14,skyLine,128,28,0);
+  if(scrollRate < skyTile0-128){
+    skyTile0-=256;
+  }
+  if(scrollRate < skyTile1-128){
+    skyTile1-=256;
+  }
+  if(scrollRate > skyTile0+128){
+    skyTile0+=256;
+  }
+  if(scrollRate > skyTile1+128){
+    skyTile1+=256;
+  }
+
+  if(skyTile0<-128){
+    arduboy.drawBitmap(scrollRate-skyTile0,14,skyLine,128,28,0);
+  }else{
+    arduboy.drawBitmap(scrollRate-skyTile0,14,skyLineIn,128,28,0);
+  }
+
+  if(skyTile1<-128){
+    arduboy.drawBitmap(scrollRate-skyTile1,14,skyLine,128,28,0);
+  }else{
+    arduboy.drawBitmap(scrollRate-skyTile1,14,skyLineTown,128,28,0);
+  }
 
 
 }
 
 
 
-void drawLevel(){
-  byte arrayX = levelX / -8;
+const int countCoins(){
+  for(short x=0;x<levelWidth;x++){
+    for(char y=0;y<levelHeight;y++){
+      char temp = pgm_read_byte(&(levelMap[y][x]));
+      if(temp == -1){
+        coinCount++;
+      }
+    }
+  }
   
+  byte tmpCount = coinCount;
+  for(short x=levelWidth;x>-1;x--){
+    for(char y=levelHeight;y>-1;y--){
+      char temp = pgm_read_byte(&(levelMap[y][x]));
+      if(temp == -1){
+        tmpCount--;
+        coins[tmpCount].x=x;
+        coins[tmpCount].y=y;
+        coins[tmpCount].collected=false;
+      }
+    }
+  }
+}
+
+
+
+void drawLevel(){
+  signed short arrayX = levelX / -8;
+
   if(arduboy.everyXFrames(2)){
-    sprites.drawSelfMasked(0,-24,sky, 0);
+    sprites.drawSelfMasked(0,-22,sky, 0);
   }else{
-    sprites.drawSelfMasked(0,-24,sky, 1);
+    sprites.drawSelfMasked(0,-22,sky, 1);
   }
 
   drawSkyline();
@@ -130,25 +185,33 @@ void drawLevel(){
         case 3: 
           arduboy.fillRect(levelX+((x+arrayX)*8)+1,y*8+1,6,6,0);
           arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,coinBox,8,8,1);break;
-        case -1: coinRotate(levelX+(x+arrayX)*8,y*8);break;
+        case -1: 
+          if(coinCheck(x+arrayX,y,0)){
+            coinRotate(levelX+(x+arrayX)*8,y*8);
+          };
+          break;
         
       }
     }
   }
-
-  drawStreetLight(levelWidth*8 / 5 * 1);
-  drawStreetLight(levelWidth*8 / 5 * 2);
-  drawStreetLight(levelWidth*8 / 5 * 3);
-  drawStreetLight(levelWidth*8 / 5 * 4);
+  drawStreetLight(levelWidth*8 / 10 * 1);
+  drawStreetLight(levelWidth*8 / 10 * 2);
+  drawStreetLight(levelWidth*8 / 10 * 3);
+  drawStreetLight(levelWidth*8 / 10 * 4);
+  drawStreetLight(levelWidth*8 / 10 * 5);
+  drawStreetLight(levelWidth*8 / 10 * 6);
+  drawStreetLight(levelWidth*8 / 10 * 7);
+  drawStreetLight(levelWidth*8 / 10 * 8);
+  drawStreetLight(levelWidth*8 / 10 * 9);
 }
 
 void drawSunMoon(){
-  arduboy.fillCircle(levelX/5+160,15, 12, 1);
+  arduboy.fillCircle((levelX/8)+(60+(levelWidth*8/2)),15, 12, 1);
 
-  arduboy.fillCircle(levelX/5+154,12, 11, 0);
+  arduboy.fillCircle((levelX/8)+(54+(levelWidth*8/2)),12, 11, 0);
 
   if(arduboy.everyXFrames(2)){
-    arduboy.fillCircle(levelX/5+160,15, 12, 1);
+    arduboy.fillCircle((levelX/8)+(60+(levelWidth*8/2)),15, 12, 1);
   }
 
 }

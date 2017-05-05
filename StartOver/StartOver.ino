@@ -13,10 +13,17 @@
 // use it for anything that needs to be set only once in your game.
 void setup() {
   // initiate arduboy instance
-  arduboy.begin();
+  if(initTrigger){
+    arduboy.begin();
+  }else{
+    arduboy.boot();
+  }
+  
+  countCoins();  
+  
 
   // default 60 > saves battery
-  arduboy.setFrameRate(45);
+  arduboy.setFrameRate(60);
 }
 
 // our main game loop, this runs once every cycle/frame.
@@ -29,6 +36,12 @@ void loop() {
 
   // first we clear our screen to black
   arduboy.clear();
+  if(initTrigger){
+
+    playerInit();
+    
+  }
+
 
   stars();
 
@@ -48,6 +61,7 @@ void loop() {
   levelX = levelX < 0-(levelWidth*8)+128 ? 0-(levelWidth*8)+128 : levelX;  
 
   initTrigger = 0;
+
 
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();

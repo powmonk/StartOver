@@ -8,11 +8,9 @@ unsigned char gameOverY=70;
 
 void handleInput(){  
 //  arduboy.print(getSolid((badMan.x-1)-levelX,badMan.y+10));
-  arduboy.print(badMan.alive);
+
   
-//if(initTrigger){
-//  badMan.alive = true;
-//}
+
 
   
 if(badMan.alive){  
@@ -140,8 +138,16 @@ if(badMan.alive){
       badMan.x -=badMan.xSpeed;
     }
     
-  
-   if(badMan.x<64 && levelX<0){
+    //This bit is to check if badMan has collected a coin. I may need to add another parameter to indicated that the state of coins[i].collected should be flipped
+//    !getSolid((badMan.x + 1)-levelX, badMan.y+17)
+    if(coinCheck((badMan.x-levelX)/8,(badMan.y+13)/8, 1)){
+      coinsCollected++;
+    }
+
+    arduboy.setCursor(0,0);
+    arduboy.print(coinsCollected);
+
+    if(badMan.x<64 && levelX<0){
       levelX   +=badMan.xSpeed;
       badMan.x +=badMan.xSpeed;
     }
@@ -180,18 +186,31 @@ if(badMan.alive){
       levelX=0;
 //      badMan.x=20;
 //      badMan.y=0;
-////      badMan.alive = true; 
+//      badMan.alive = true; 
 //      badMan.xDirection = true;
+      coinCount = 0;
+      coinsCollected = 0;
+      setup();
       playerInit();
-      gameOverY = 70; 
       initTrigger = 1;
+      gameOverY = 70;
     }
+//    else if(arduboy.pressed(B_BUTTON) && deadBool && gameOverY==10){
+//      arduboy.clear();
+//
+//      if(arduboy.everyXFrames(2)){
+//        sprites.drawSelfMasked(32,12,dead,0);
+//      }else{
+//        sprites.drawSelfMasked(32,12,dead,1);
+//      }
+//        
+//    }
 
-    if(badMan.y > 0-16){
+    if(badMan.y>-16){
       badMan.y--;
     }
   }
-  if(badMan.y>64-16){
+  if(badMan.y+16>=78 || coinsCollected == coinCount){
     badMan.alive = false;
   }
 

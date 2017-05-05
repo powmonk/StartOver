@@ -4,6 +4,7 @@
 #define PIXEL_SAFE_MODE
 
 #include "Arduboy2.h"
+//#include <list>
 #include "entities.h"
 #include "environment.h"
 #include "bitmaps.h"
@@ -13,19 +14,24 @@
 Arduboy2 arduboy;
 Sprites sprites;
 
-short levelX = 0;
+long levelX = 0;
 char screenTiles[17][8];
 char coinFrame = 0;
 bool initTrigger = 1;
 const byte starCount = 100;
-const char showerSize = 10;
+const char showerSize = 50;
 const char cloudCount = 3;
-int levelWidth = sizeof(levelMap[8]);
+short levelWidth = sizeof(levelMap[7]);
+char levelHeight = 8;
+int coinCount;
+signed char wind=0-2;
+byte coinsCollected=0;
+
 
 
 struct Droplet{
-  short x;
-  short y;
+  signed short x;
+  signed char y;
 };
 
 struct Cloud{
@@ -43,6 +49,20 @@ struct Background{
   signed short x;
 };
 
+struct Coin{
+  short x;
+  char  y;
+  bool  collected;
+};
+
+struct Coin coins[50];
+
+
+//struct Coin coins[];
+
+//void declareCoins(byte i){
+//  struct Coin coins[i];
+//}
 struct Droplet drop[showerSize];
 struct Cloud cloudArray[cloudCount];
 struct Star starArray[starCount];
@@ -50,9 +70,15 @@ struct Background skyline;
 
 // This method returns a boolean solid/not solid for the foreground
 // and takes x/y co-ords as parameters.
+
 bool getSolid(short x, short y){
   x/=8;
   y/=8;
+
+  if(y>7 || y<0){
+    return false;
+  }
+
 
   char temp = pgm_read_byte( & (levelMap[y][x]) );
 
@@ -61,6 +87,8 @@ bool getSolid(short x, short y){
   }
   return false;
 }
+
+
 bool getCoinBox(short x, short y){
   x/=8;
   y/=8;
@@ -134,7 +162,7 @@ void drawPlayer(){
 
 void coinRotate(signed char x, signed char y){
   
-  sprites.drawSelfMasked(x,y-2,coinAnim,coinFrame);
+  sprites.drawSelfMasked(x+1,y-2,coinAnim,coinFrame);
   
   if(arduboy.everyXFrames(10)){
     coinFrame++;
@@ -176,6 +204,21 @@ void coinBoxAnim(char x, char y){
   coinRotate(x+64, y-8);  
   
 }
+
+bool coinCheck(int x, char y, bool collect){
+  for(int i=0;i<coinCount;i++){
+    if(coins[i].x == x && coins[i].y == y && coins[i].collected ==  false){
+      if(collect == true){
+        coins[i].collected = true;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+
+    
 
 #endif
 
