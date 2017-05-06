@@ -120,6 +120,12 @@ void drawSkyline(){
     skyTile1+=256;
   }
 
+// // if(!arduboy.everyXFrames(2)){
+//    arduboy.drawBitmap(scrollRate-skyTile0,32,screenDither, 128, 28, 0);
+//    arduboy.drawBitmap(scrollRate-skyTile1,32,screenDither, 128, 28, 0);
+//  //}
+
+
   if(skyTile0<-128){
     arduboy.drawBitmap(scrollRate-skyTile0,14,skyLine,128,28,0);
   }else{
@@ -132,15 +138,15 @@ void drawSkyline(){
   }else{
     arduboy.drawBitmap(scrollRate-skyTile1,14,skyLineTown,128,28,0);
   }
-if(arduboy.everyXFrames(2)){
-  arduboy.drawBitmap(scrollRate-skyTile0,40,screenDither, 128, 28, 1);
-  arduboy.drawBitmap(scrollRate-skyTile1,40,screenDither, 128, 28, 1);
-}
-//else{
-//  if(arduboy.everyXFrames(random(3))){
-//    arduboy.drawBitmap(scrollRate-(skyTile0),40,screenDither, 128, 28, 1);
-//    arduboy.drawBitmap(scrollRate-(skyTile1),40,screenDither, 128, 28, 1);
+//  if(arduboy.everyXFrames(2)){
+//    arduboy.drawBitmap(scrollRate-skyTile0,46,screenDither, 128, 28, 1);
+//    arduboy.drawBitmap(scrollRate-skyTile1,46,screenDither, 128, 28, 1);
 //  }
+//else{
+////  if(arduboy.everyXFrames(random(3))){
+//    arduboy.drawBitmap(scrollRate-(skyTile0),51,screenDither, 128, 28, 1);
+//    arduboy.drawBitmap(scrollRate-(skyTile1),51,screenDither, 128, 28, 1);
+////  }
 //}
 
 
@@ -182,6 +188,13 @@ void drawLevel(){
   }else{
     sprites.drawSelfMasked(0,-22,sky, 1);
   }
+
+//  if(arduboy.everyXFrames(2)){
+//    arduboy.drawBitmap(0,28,screenDither, 128, 28, 0);
+//  }else{
+//    arduboy.drawBitmap(4,34,screenDither, 128, 28, 0);
+//
+//  }
 
   drawSkyline();
 

@@ -26,6 +26,7 @@ if(badMan.alive){
       badMan.jumping=false;
       if(getCoinBox((badMan.x + 3)-levelX,badMan.y+9)){
         coinBoxAnim((badMan.x + 3)-levelX,badMan.y+9);
+        playCoinTone();
       }
       
     }
