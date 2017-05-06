@@ -126,11 +126,22 @@ void drawSkyline(){
     arduboy.drawBitmap(scrollRate-skyTile0,14,skyLineIn,128,28,0);
   }
 
+
   if(skyTile1<-128){
     arduboy.drawBitmap(scrollRate-skyTile1,14,skyLine,128,28,0);
   }else{
     arduboy.drawBitmap(scrollRate-skyTile1,14,skyLineTown,128,28,0);
   }
+if(arduboy.everyXFrames(2)){
+  arduboy.drawBitmap(scrollRate-skyTile0,40,screenDither, 128, 28, 1);
+  arduboy.drawBitmap(scrollRate-skyTile1,40,screenDither, 128, 28, 1);
+}
+//else{
+//  if(arduboy.everyXFrames(random(3))){
+//    arduboy.drawBitmap(scrollRate-(skyTile0),40,screenDither, 128, 28, 1);
+//    arduboy.drawBitmap(scrollRate-(skyTile1),40,screenDither, 128, 28, 1);
+//  }
+//}
 
 
 }
@@ -174,6 +185,11 @@ void drawLevel(){
 
   drawSkyline();
 
+//  if(arduboy.everyXFrames(2)){
+//      arduboy.drawBitmap(0,46,screenDither, 128, 28, 1);
+
+//  }
+
   for(char x=0;x<17;x++){
     for(char y=0;y<8;y++){
       char temp = pgm_read_byte(&(levelMap[y][x+arrayX]));
@@ -206,12 +222,12 @@ void drawLevel(){
 }
 
 void drawSunMoon(){
-  arduboy.fillCircle((levelX/8)+(60+(levelWidth*8/2)),15, 12, 1);
+  arduboy.fillCircle((levelX/8)+260,15, 12, 1);
 
-  arduboy.fillCircle((levelX/8)+(54+(levelWidth*8/2)),12, 11, 0);
+  arduboy.fillCircle((levelX/8)+254,12, 11, 0);
 
   if(arduboy.everyXFrames(2)){
-    arduboy.fillCircle((levelX/8)+(60+(levelWidth*8/2)),15, 12, 1);
+    arduboy.fillCircle((levelX/8)+260,15, 12, 1);
   }
 
 }

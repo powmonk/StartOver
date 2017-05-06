@@ -233,7 +233,7 @@ void playDeadTone(){
 //  sound.tone(1000);
 }
 void playJumpTone(){
-  sound.tone(0700, 50,0100, 200);
+  sound.tone(0100, 200,0700, 50);
 //  sound.tone(1000);
 }
 
