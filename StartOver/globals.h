@@ -1,25 +1,31 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#define PIXEL_SAFE_MODE
 
-#include "Arduboy2.h"
+
+#include <Arduboy2.h>
+#include <ArduboyTones.h>
+//#include <ArduboyTonesPitches.h>
 //#include <list>
 #include "entities.h"
 #include "environment.h"
 #include "bitmaps.h"
 
+//#define VOLUME_IN_TONE 0
+#define PIXEL_SAFE_MODE
+
 
 
 Arduboy2 arduboy;
+ArduboyTones sound(arduboy.audio.enabled);
 Sprites sprites;
 
 long levelX = 0;
 char screenTiles[17][8];
 char coinFrame = 0;
 bool initTrigger = 1;
-const byte starCount = 100;
-const char showerSize = 50;
+const byte starCount = 20;
+const char showerSize = 15;
 const char cloudCount = 3;
 short levelWidth = sizeof(levelMap[7]);
 char levelHeight = 8;
@@ -217,6 +223,19 @@ bool coinCheck(int x, char y, bool collect){
   return false;
 }
 
+void playCoinTone(){
+  sound.tone(3087, 100,4120, 250);
+//  sound.tone(1000);
+}
+void playDeadTone(){
+  sound.tone(0100, 200, 0700, 200,100, 200);
+//  playDeadTone();
+//  sound.tone(1000);
+}
+void playJumpTone(){
+  sound.tone(0700, 50,0100, 200);
+//  sound.tone(1000);
+}
 
     
 

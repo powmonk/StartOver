@@ -142,6 +142,7 @@ if(badMan.alive){
 //    !getSolid((badMan.x + 1)-levelX, badMan.y+17)
     if(coinCheck((badMan.x-levelX)/8,(badMan.y+13)/8, 1)){
       coinsCollected++;
+      playCoinTone();
     }
 
     arduboy.setCursor(0,0);
@@ -154,6 +155,7 @@ if(badMan.alive){
     
     if(arduboy.pressed(B_BUTTON) && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
       badMan.jumping = true;
+      playJumpTone();
       badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
     }
   
@@ -212,6 +214,7 @@ if(badMan.alive){
   }
   if(badMan.y+16>=78 || coinsCollected == coinCount){
     badMan.alive = false;
+    playDeadTone();
   }
 
 }
