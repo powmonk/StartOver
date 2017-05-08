@@ -20,6 +20,8 @@ void setup() {
   }
   
   countShit();
+  playerInit();
+  baddieInit();
     
 //  playerInit();
   
@@ -54,6 +56,8 @@ void loop() {
   drawLevel();
 
   handleInput();
+
+  drawGoons();
 
   drawPlayer();
 

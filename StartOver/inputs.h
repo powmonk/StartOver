@@ -83,6 +83,10 @@ if(badMan.alive){
     }
   
     if(arduboy.pressed(UP_BUTTON)){
+      badMan.crouching = false;
+      if(badMan.frame == 5){
+        badMan.frame = 0;
+      }
     }
   
     // Crouching
@@ -97,6 +101,9 @@ if(badMan.alive){
     }else{
       if(!getSolid((badMan.x+3)-levelX, badMan.y+4)){
         badMan.crouching = false;
+        if(badMan.frame == 5){
+          badMan.frame = 0;
+        }
       }
       
     }
@@ -155,7 +162,7 @@ if(badMan.alive){
       badMan.x +=badMan.xSpeed;
     }
     
-    if(arduboy.pressed(B_BUTTON) && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
+    if(arduboy.pressed(B_BUTTON)/* || goonKilled == true */&& !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
       badMan.jumping = true;
       playJumpTone();
       badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
@@ -175,7 +182,7 @@ if(badMan.alive){
       deadBool = !deadBool;
     }
     
-    if(arduboy.everyXFrames(2) && gameOverY>10 && badMan.y<5){
+    if(/*arduboy.everyXFrames(2) && */gameOverY>10 && badMan.y<5){
       gameOverY--;
     }
     arduboy.drawBitmap(0,gameOverY-1, gameOverBG, 128, 23, 0);
@@ -195,7 +202,6 @@ if(badMan.alive){
       coinCount = 0;
       coinsCollected = 0;
       setup();
-      playerInit();
       initTrigger = 1;
       gameOverY = 70;
     }

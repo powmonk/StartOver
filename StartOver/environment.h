@@ -231,6 +231,7 @@ void drawLevel(){
         
         
         case  4: sprites.drawSelfMasked(levelX+((x+arrayX)*8),y*8,spike,flick);break;
+        case  5: sprites.drawSelfMasked(levelX+((x+arrayX)*8)-1,y*8,pipe,flick);break;
         
       }
     }

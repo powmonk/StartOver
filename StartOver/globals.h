@@ -28,6 +28,7 @@ bool flick = 0;
 const byte starCount = 10;
 const char showerSize = 15;
 const char cloudCount = 3;
+const char baddieCount = 5;
 short levelWidth = sizeof(levelMap[7]);
 char levelHeight = 8;
 byte coinCount;
@@ -35,6 +36,15 @@ byte boxCount;
 signed char wind=0-2;
 byte coinsCollected=0;
 
+void playCoinTone(){
+  sound.tone(3087, 100,4120, 250);
+}
+void playDeadTone(){
+  sound.tone(0100, 200, 0700, 200,100, 200);
+}
+void playJumpTone(){
+  sound.tone(0100, 200,0700, 50);
+}
 
 
 struct Droplet{
@@ -129,24 +139,24 @@ bool getCoinBox(short x, short y){
   return false;
 }
 
-
 //PLAYER STRUCT
-
 struct Player{
-  short x;
+  float x;
   short y;
-  byte frame;
-  int ceiling;
-  char xSpeed;
-  bool alive;
-  bool xDirection;
-  bool falling;
-  bool jumping;
-  bool crouching;
+  byte  frame;
+  int   ceiling;
+  float  xSpeed;
+  bool  alive;
+  bool  xDirection;
+  bool  falling;
+  bool  jumping;
+  bool  crouching;
   
 };
 
 struct Player badMan;
+struct Rect   badManHit;
+struct Point  badManKill;
 
 void playerInit(){
   badMan.x          = 20;
@@ -160,6 +170,15 @@ void playerInit(){
 
 void drawPlayer(){
   if(badMan.alive){
+
+    badManHit.x = badMan.x+1;
+    badManHit.y = badMan.y+9;
+    badManHit.width = 4;
+    badManHit.width = 7;
+
+    badManKill.x  = badMan.x+3;
+    badManKill.y  = badMan.y+16;
+    
     if(badMan.frame<5){
       arduboy.drawFastHLine(badMan.x+1,badMan.y+9,4,0);
       arduboy.drawFastHLine(badMan.x+1,badMan.y+10,4,0);
@@ -187,6 +206,100 @@ void drawPlayer(){
   }
 }
 
+// BADDIE STRUCT
+struct Baddie{
+  float x;
+  byte  y;
+  bool  alive;
+  bool  xDirection;
+  bool  falling;
+};
+
+struct Baddie goon[baddieCount];
+struct Rect goonHit[baddieCount];
+
+void baddieInit(){
+  byte xPos = (levelWidth*8)/(baddieCount+1);
+
+  for(byte i=0;i<baddieCount;i++){
+    goon[i].x          = xPos * i;
+    goon[i].y          = 10;
+    goon[i].alive      = 1;
+    goon[i].xDirection = 1;
+    goon[i].falling    = 1;
+  }
+}
+
+void drawGoons(){
+  for(byte i=0;i<baddieCount;i++){
+    if(goon[i].alive){
+
+      goonHit[i].x      = (goon[i].x + 1)+levelX;
+      goonHit[i].y      = goon[i].y + 2;
+      goonHit[i].width  = 14;
+      goonHit[i].height = 8;
+
+      if(arduboy.collide(badManHit, goonHit[i])){
+        badMan.alive = false;
+      }
+
+      if(arduboy.collide(badManKill, goonHit[i])){
+        badMan.falling=false;
+        badMan.jumping=true;
+        badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
+//        badMan.y--;
+        playDeadTone();
+        goon[i].alive = false;
+      }
+      
+      
+      arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieBody, 16, 11, 1);
+      if(goon[i].xDirection == 0){
+        arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y+2, baddieFaceLeft, 11, 8, 0);
+      }else{
+        arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y+2, baddieFaceRight, 11, 8, 0);
+      }
+  
+      if(!getSolid(goon[i].x+8, goon[i].y+11)){
+        goon[i].falling == true;
+        goon[i].y++;
+      }else{
+        goon[i].falling = false;
+      }
+
+      if(goon[i].y>64){
+        goon[i].alive = false;
+      }
+  
+      if(goon[i].falling == false && goon[i].xDirection){
+        if(!getSolid(goon[i].x+17, goon[i].y+10) && !getSolid(goon[i].x+17, goon[i].y)){
+          goon[i].x+=0.5;
+        }else{
+          goon[i].xDirection = !goon[i].xDirection;
+        }
+      }
+  
+      if(goon[i].falling == false && !goon[i].xDirection){
+        if(!getSolid(goon[i].x-1, goon[i].y+10) && !getSolid(goon[i].x-1, goon[i].y)){
+          goon[i].x-=0.5;
+        }else{
+          goon[i].xDirection = !goon[i].xDirection;
+        }
+      }
+    }else{
+      if(goon[i].y<70){
+        goon[i].y++;
+        arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieBody, 16, 11, 1);
+        if(goon[i].xDirection == 0){
+          arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y+2, baddieFaceLeft, 11, 8, 0);
+        }else{
+          arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y+2, baddieFaceRight, 11, 8, 0);
+        }
+      }
+
+    }
+  }  
+}
 void coinRotate(signed char x, signed char y){
   
   sprites.drawSelfMasked(x+1,y-2,coinAnim,coinFrame);
@@ -253,18 +366,6 @@ bool boxCheck(int x, char y, bool hit){
   }
   return false;
 }
-
-void playCoinTone(){
-//  sound.tone(3087, 100,4120, 250);
-}
-void playDeadTone(){
-//  sound.tone(0100, 200, 0700, 200,100, 200);
-}
-void playJumpTone(){
-//  sound.tone(0100, 200,0700, 50);
-}
-
-    
 
 #endif
 
