@@ -19,9 +19,10 @@ void setup() {
     arduboy.boot();
   }
   
-  countCoins();  
+  countShit();
+    
+//  playerInit();
   
-
   // default 60 > saves battery
   arduboy.setFrameRate(60);
 }
@@ -42,6 +43,7 @@ void loop() {
     
   }
 
+  flick = !flick;
 
   stars();
 

@@ -20,23 +20,25 @@ Arduboy2 arduboy;
 ArduboyTones sound(arduboy.audio.enabled);
 Sprites sprites;
 
-long levelX = 0;
+short levelX = 0;
 char screenTiles[17][8];
 char coinFrame = 0;
 bool initTrigger = 1;
-const byte starCount = 50;
-const char showerSize = 25;
+bool flick = 0;
+const byte starCount = 10;
+const char showerSize = 15;
 const char cloudCount = 3;
 short levelWidth = sizeof(levelMap[7]);
 char levelHeight = 8;
-int coinCount;
+byte coinCount;
+byte boxCount;
 signed char wind=0-2;
 byte coinsCollected=0;
 
 
 
 struct Droplet{
-  signed short x;
+  signed char x;
   signed char y;
 };
 
@@ -46,7 +48,7 @@ struct Cloud{
 };
 
 struct Star{
-  short x;
+  signed char x;
   signed char y;
 };
 
@@ -61,7 +63,23 @@ struct Coin{
   bool  collected;
 };
 
-struct Coin coins[50];
+struct Box{
+  short x;
+  char  y;
+  bool  hit;
+};
+
+struct Coin coins[10];
+
+struct Box boxes[10];
+
+//struct mysteryBox{
+//  short x;
+//  char  y;
+//  bool  collected;
+//};
+//
+//struct Coin coins[50];
 
 
 //struct Coin coins[];
@@ -77,23 +95,27 @@ struct Background skyline;
 // This method returns a boolean solid/not solid for the foreground
 // and takes x/y co-ords as parameters.
 
-bool getSolid(short x, short y){
-  x/=8;
-  y/=8;
+//bool getSolid(short x, short y){
+//  x/=8;y/=8;
+//  if(y>7 || y<0){return false;}
+//  char temp = pgm_read_byte( & (levelMap[y][x]) );
+//  if(temp>0){return true;}
+//  return false;
+//}
 
-  if(y>7 || y<0){
-    return false;
-  }
 
-
+char getTileType(short x, signed char y){
+  x/=8;y/=8;
   char temp = pgm_read_byte( & (levelMap[y][x]) );
-
-  if(temp>0){
-    return true;
-  }
-  return false;
+  return temp;
 }
 
+bool getSolid(short x, signed char y){
+  if(y/8>7 || y/8<0){return false;}
+  char temp = getTileType(x,y);
+  if(temp>0){return true;}
+  return false;
+}
 
 bool getCoinBox(short x, short y){
   x/=8;
@@ -160,9 +182,8 @@ void drawPlayer(){
       sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceLeft, badMan.frame);
     }
   }else{
-    if(arduboy.everyXFrames(2)){
+    if(flick)
       sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, 0);
-    }
   }
 }
 
@@ -182,8 +203,6 @@ void coinRotate(signed char x, signed char y){
 ///
 
 void coinBoxAnim(char x, char y){
-  bool done = false;
-  
 //  while(!done){
 //    if(!getSolid(x,y)){
 //      x++;
@@ -205,8 +224,8 @@ void coinBoxAnim(char x, char y){
 //  }
   x/=8;
   y/=8;
-  x*=8;
-  y*=8;
+//  x*=8;
+//  y*=8;
   coinRotate(x+64, y-8);  
   
 }
@@ -223,18 +242,26 @@ bool coinCheck(int x, char y, bool collect){
   return false;
 }
 
+bool boxCheck(int x, char y, bool hit){
+  for(int i=0;i<boxCount;i++){
+    if(boxes[i].x == x && boxes[i].y == y && boxes[i].hit ==  false){
+      if(hit == true){
+        boxes[i].hit = true;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
 void playCoinTone(){
-  sound.tone(3087, 100,4120, 250);
-//  sound.tone(1000);
+//  sound.tone(3087, 100,4120, 250);
 }
 void playDeadTone(){
-  sound.tone(0100, 200, 0700, 200,100, 200);
-//  playDeadTone();
-//  sound.tone(1000);
+//  sound.tone(0100, 200, 0700, 200,100, 200);
 }
 void playJumpTone(){
-  sound.tone(0100, 200,0700, 50);
-//  sound.tone(1000);
+//  sound.tone(0100, 200,0700, 50);
 }
 
     

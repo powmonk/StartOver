@@ -22,13 +22,13 @@ if(badMan.alive){
     }
   
     if(getSolid((badMan.x + 3)-levelX,badMan.y+9) && badMan.jumping){
+      if(boxCheck(((badMan.x + 3)-levelX)/8, (badMan.y+9)/8, 1)){
+        coinsCollected++;  
+        playCoinTone();
+        coinBoxAnim(((badMan.x + 3)-levelX)/8, (badMan.y+9)/8);
+      }
       badMan.falling=true;
       badMan.jumping=false;
-      if(getCoinBox((badMan.x + 3)-levelX,badMan.y+9)){
-        coinBoxAnim((badMan.x + 3)-levelX,badMan.y+9);
-        playCoinTone();
-      }
-      
     }
   
     if(badMan.falling){
@@ -139,7 +139,7 @@ if(badMan.alive){
       badMan.x -=badMan.xSpeed;
     }
     
-    //This bit is to check if badMan has collected a coin. I may need to add another parameter to indicated that the state of coins[i].collected should be flipped
+    //This bit is to check if badMan has collected a coin
 //    !getSolid((badMan.x + 1)-levelX, badMan.y+17)
     if(coinCheck((badMan.x-levelX)/8,(badMan.y+13)/8, 1)){
       coinsCollected++;
@@ -148,6 +148,7 @@ if(badMan.alive){
 
     arduboy.setCursor(0,0);
     arduboy.print(coinsCollected);
+//    arduboy.print(boxCount);
 
     if(badMan.x<64 && levelX<0){
       levelX   +=badMan.xSpeed;
@@ -213,7 +214,8 @@ if(badMan.alive){
       badMan.y--;
     }
   }
-  if(badMan.y+16>=78 || coinsCollected == coinCount){
+  if(badMan.y+16>=78 || coinsCollected == coinCount || getTileType((badMan.x+3)-levelX,badMan.y+16) == 4){
+    badMan.frame = 0;
     badMan.alive = false;
     playDeadTone();
   }
