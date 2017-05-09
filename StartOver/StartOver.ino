@@ -27,6 +27,7 @@ void setup() {
   
   // default 60 > saves battery
   arduboy.setFrameRate(60);
+  Serial.begin(9600);
 }
 
 // our main game loop, this runs once every cycle/frame.
@@ -55,9 +56,9 @@ void loop() {
 
   drawLevel();
 
-  handleInput();
-
   drawGoons();
+
+  handleInput();
 
   drawPlayer();
 
@@ -68,7 +69,7 @@ void loop() {
 
   initTrigger = 0;
 
-
+  Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
   // then we finaly we tell the arduboy to display what we just wrote to the display
   arduboy.display();
 }

@@ -25,6 +25,8 @@ char screenTiles[17][8];
 char coinFrame = 0;
 bool initTrigger = 1;
 bool flick = 0;
+bool doorOpen = 0;
+bool levelComplete = 0;
 const byte starCount = 10;
 const char showerSize = 15;
 const char cloudCount = 3;
@@ -37,13 +39,13 @@ signed char wind=0-2;
 byte coinsCollected=0;
 
 void playCoinTone(){
-  sound.tone(3087, 100,4120, 250);
+//  sound.tone(3087, 100,4120, 250);
 }
 void playDeadTone(){
-  sound.tone(0100, 200, 0700, 200,100, 200);
+//  sound.tone(0100, 200, 0700, 200,100, 200);
 }
 void playJumpTone(){
-  sound.tone(0100, 200,0700, 50);
+//  sound.tone(0100, 200,0700, 50);
 }
 
 
@@ -114,9 +116,9 @@ struct Background skyline;
 //}
 
 
-char getTileType(short x, signed char y){
+signed char getTileType(short x, signed char y){
   x/=8;y/=8;
-  char temp = pgm_read_byte( & (levelMap[y][x]) );
+  signed char temp = pgm_read_byte( & (levelMap[y][x]) );
   return temp;
 }
 
@@ -202,7 +204,11 @@ void drawPlayer(){
     }
   }else{
     if(flick)
-      sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, 0);
+      if(badMan.xDirection){
+        sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceRight, 6);
+      }else{
+        sprites.drawSelfMasked(badMan.x,badMan.y,badManFaceLeft, 6);
+      }
   }
 }
 
@@ -240,6 +246,7 @@ void drawGoons(){
       goonHit[i].height = 8;
 
       if(arduboy.collide(badManHit, goonHit[i])){
+//        badMan.frame = 6;
         badMan.alive = false;
       }
 
@@ -255,9 +262,9 @@ void drawGoons(){
       
       arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieBody, 16, 11, 1);
       if(goon[i].xDirection == 0){
-        arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y+2, baddieFaceLeft, 11, 8, 0);
+        arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieFaceLeft, 11, 11, 0);
       }else{
-        arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y+2, baddieFaceRight, 11, 8, 0);
+        arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y, baddieFaceRight, 11, 11, 0);
       }
   
       if(!getSolid(goon[i].x+8, goon[i].y+11)){
@@ -291,9 +298,9 @@ void drawGoons(){
         goon[i].y++;
         arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieBody, 16, 11, 1);
         if(goon[i].xDirection == 0){
-          arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y+2, baddieFaceLeft, 11, 8, 0);
+          arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y, baddieFaceLeft, 11, 11, 0);
         }else{
-          arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y+2, baddieFaceRight, 11, 8, 0);
+          arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y, baddieFaceRight, 11, 11, 0);
         }
       }
 

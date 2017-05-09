@@ -196,6 +196,14 @@ bool drawBox(short x, byte y){
   }
 }
 
+void drawDoor(short x, byte y){
+  if(!doorOpen){
+    sprites.drawOverwrite(x,y,door,flick);
+  }else{
+    sprites.drawOverwrite(x,y,door,2+flick);
+  }
+  
+}
 
 void drawLevel(){
   signed short arrayX = levelX / -8;
@@ -209,7 +217,7 @@ void drawLevel(){
       char temp = pgm_read_byte(&(levelMap[y][x+arrayX]));
 
       switch(temp){
-        case -3: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,door,flick);break;
+        case -3: drawDoor(levelX+((x+arrayX)*8),y*8);break;
         case -2: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile1,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;
         case -1: if(coinCheck(x+arrayX,y,0))coinRotate(levelX+(x+arrayX)*8,y*8);break;
 
