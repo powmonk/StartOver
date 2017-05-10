@@ -152,6 +152,7 @@ struct Player{
   bool  xDirection;
   bool  falling;
   bool  jumping;
+  bool  jumpCooldown;
   bool  crouching;
   
 };
@@ -161,13 +162,15 @@ struct Rect   badManHit;
 struct Point  badManKill;
 
 void playerInit(){
-  badMan.x          = 20;
-  badMan.y          = 0;
-  badMan.frame      = 0;
-  badMan.xDirection = 1;
-  badMan.falling    = true;
-  badMan.jumping    = false;
-  badMan.alive      = true;
+  badMan.x            = 20;
+  badMan.y            = 0;
+  badMan.frame        = 0;
+  badMan.xDirection   = 1;
+  badMan.falling      = true;
+  badMan.jumping      = false;
+  badMan.jumpCooldown = false;
+  badMan.alive        = true;
+  
 }
 
 void drawPlayer(){
@@ -298,9 +301,9 @@ void drawGoons(){
         goon[i].y++;
         arduboy.drawBitmap(goon[i].x+levelX, goon[i].y, baddieBody, 16, 11, 1);
         if(goon[i].xDirection == 0){
-          arduboy.drawBitmap(goon[i].x+1+levelX, goon[i].y, baddieFaceLeft, 11, 11, 0);
+          arduboy.drawBitmap(goon[i].x+2+levelX, goon[i].y, baddieFaceLeftDead, 11, 11, 0);
         }else{
-          arduboy.drawBitmap(goon[i].x+5+levelX, goon[i].y, baddieFaceRight, 11, 11, 0);
+          arduboy.drawBitmap(goon[i].x+3+levelX, goon[i].y, baddieFaceRightDead, 11, 11, 0);
         }
       }
 

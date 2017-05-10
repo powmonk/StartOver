@@ -174,8 +174,9 @@ if(badMan.alive && !levelComplete){
       badMan.x +=badMan.xSpeed;
     }
     
-    if(arduboy.pressed(B_BUTTON)/* || goonKilled == true */&& !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
+    if(arduboy.pressed(B_BUTTON) && !badMan.jumpCooldown && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
       badMan.jumping = true;
+      badMan.jumpCooldown = true;
       playJumpTone();
       badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
     }
@@ -187,6 +188,11 @@ if(badMan.alive && !levelComplete){
         badMan.jumping = false;
         badMan.falling = true;
       }
+      
+    }
+
+    if(arduboy.justReleased(B_BUTTON)){
+      badMan.jumpCooldown = false;
       
     }
   }else{

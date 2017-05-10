@@ -47,6 +47,7 @@ void loop() {
   }
 
   flick = !flick;
+  arduboy.pollButtons();
 
   stars();
 
