@@ -12,6 +12,12 @@
 // This function runs once in your game.
 // use it for anything that needs to be set only once in your game.
 void setup() {
+  Serial.begin(9600);
+  levelX=0;
+  coinCount = 0;
+  coinsCollected = 0;
+
+
   // initiate arduboy instance
   if(initTrigger){
     arduboy.begin();
@@ -27,7 +33,6 @@ void setup() {
   
   // default 60 > saves battery
   arduboy.setFrameRate(60);
-  Serial.begin(9600);
 }
 
 // our main game loop, this runs once every cycle/frame.

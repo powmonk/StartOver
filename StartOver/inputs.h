@@ -89,8 +89,6 @@ if(badMan.alive && !levelComplete){
         badMan.frame = 0;
       }
       if(doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5) == -3){
-        arduboy.setCursor(0,8);
-        arduboy.print(getTileType(badMan.x+3, badMan.y+2) == -3);
         levelComplete = true;
       }
     }
@@ -164,9 +162,13 @@ if(badMan.alive && !levelComplete){
       playCoinTone();
     }
 
-    arduboy.setCursor(0,0);
-    arduboy.print(getTileType(badMan.x+3-levelX, badMan.y+5));
-//    arduboy.print(coinsCollected);
+//    sprites.drawSelfMasked(0,1,coinAnim, 1);
+//    arduboy.setCursor(6,0);
+//    arduboy.print("=");
+    arduboy.setCursor(124,1);
+    arduboy.print(coinsCollected);
+    coinRotate(116,2);
+
 //    arduboy.print(boxCount);
 
     if(badMan.x<64 && levelX<0){
@@ -188,7 +190,6 @@ if(badMan.alive && !levelComplete){
         badMan.jumping = false;
         badMan.falling = true;
       }
-      
     }
 
     if(arduboy.justReleased(B_BUTTON)){
@@ -213,12 +214,9 @@ if(badMan.alive && !levelComplete){
       sprites.drawSelfMasked(0,gameOverY-1,gameOver,0);
   
       if(arduboy.pressed(B_BUTTON) && !deadBool && gameOverY==10){
-        levelX=0;
-        coinCount = 0;
-        coinsCollected = 0;
+        gameOverY = 70;
         setup();
         initTrigger = 1;
-        gameOverY = 70;
       }
   
       if(badMan.y>-16){
@@ -228,6 +226,14 @@ if(badMan.alive && !levelComplete){
     if(levelComplete){
       if(gameOverY>18){
         gameOverY--;
+      }else{
+        if(arduboy.pressed(B_BUTTON) || arduboy.pressed(A_BUTTON)){
+          levelComplete = 0;
+          levelCount++;
+          gameOverY = 70;
+          setup();
+          initTrigger = 1;
+        }
       }
       arduboy.drawBitmap(10,gameOverY, wellDoneBG, 111, 16, 0);
       arduboy.drawBitmap(10,gameOverY, wellDone,   111, 16, 1);

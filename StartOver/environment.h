@@ -156,7 +156,7 @@ void countShit(){
   
   for(short x=0;x<levelWidth;x++){
     for(char y=0;y<levelHeight;y++){
-      char temp = pgm_read_byte(&(levelMap[y][x]));
+      char temp = pgm_read_byte(&(levelMap0[y][x]));
       if(temp == -1){
         coinCount++;
       }
@@ -170,7 +170,7 @@ void countShit(){
   byte tmpBoxCount = boxCount;
   for(short x=levelWidth;x>-1;x--){
     for(char y=levelHeight;y>-1;y--){
-      char temp = pgm_read_byte(&(levelMap[y][x]));
+      char temp = pgm_read_byte(&(levelMap0[y][x]));
       if(temp == -1){
         tmpCoinCount--;
         coins[tmpCoinCount].x=x;
@@ -212,10 +212,10 @@ void drawLevel(){
 
   drawSkyline();
 
+  char temp;
   for(char x=0;x<17;x++){
     for(char y=0;y<8;y++){
-      char temp = pgm_read_byte(&(levelMap[y][x+arrayX]));
-
+      getTileType(x+arrayX, y);
       switch(temp){
         case -3: drawDoor(levelX+((x+arrayX)*8),y*8);break;
         case -2: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile1,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;

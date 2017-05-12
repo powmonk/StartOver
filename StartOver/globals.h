@@ -31,12 +31,13 @@ const byte starCount = 10;
 const char showerSize = 15;
 const char cloudCount = 3;
 const char baddieCount = 5;
-short levelWidth = sizeof(levelMap[7]);
+short levelWidth = sizeof(levelMap0[7]);
 char levelHeight = 8;
 byte coinCount;
 byte boxCount;
 signed char wind=0-2;
 byte coinsCollected=0;
+byte levelCount = 0;
 
 void playCoinTone(){
 //  sound.tone(3087, 100,4120, 250);
@@ -118,12 +119,16 @@ struct Background skyline;
 
 signed char getTileType(short x, signed char y){
   x/=8;y/=8;
-  signed char temp = pgm_read_byte( & (levelMap[y][x]) );
+  char temp;
+  switch(levelCount){
+    case 0: temp = pgm_read_byte(&(levelMap0[y][x]));break;
+    case 1: temp = pgm_read_byte(&(levelMap1[y][x]));break;
+  }
   return temp;
 }
 
 bool getSolid(short x, signed char y){
-  if(y/8>7 || y/8<0){return false;}
+  if(y/8>7 || y/8<0 || x<0){return false;}
   char temp = getTileType(x,y);
   if(temp>0){return true;}
   return false;
@@ -133,7 +138,7 @@ bool getCoinBox(short x, short y){
   x/=8;
   y/=8;
 
-  char temp = pgm_read_byte( & (levelMap[y][x]) );
+  char temp = pgm_read_byte( & (levelMap0[y][x]) );
 
   if(temp==3){
     return true;
