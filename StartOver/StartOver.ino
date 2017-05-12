@@ -32,7 +32,7 @@ void setup() {
 //  playerInit();
   
   // default 60 > saves battery
-  arduboy.setFrameRate(60);
+  arduboy.setFrameRate(45);
 }
 
 // our main game loop, this runs once every cycle/frame.
@@ -74,6 +74,10 @@ void loop() {
   levelX = levelX < 0-(levelWidth*8)+128 ? 0-(levelWidth*8)+128 : levelX;  
 
   initTrigger = 0;
+
+//    arduboy.setCursor(0,0);
+//  arduboy.print();
+
 
   Serial.write(arduboy.getBuffer(), 128 * 64 / 8);
   // then we finaly we tell the arduboy to display what we just wrote to the display

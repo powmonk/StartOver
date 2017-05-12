@@ -37,6 +37,7 @@ byte coinCount;
 byte boxCount;
 signed char wind=0-2;
 byte coinsCollected=0;
+byte totalCoins;
 byte levelCount = 0;
 
 void playCoinTone(){
@@ -105,21 +106,11 @@ struct Cloud cloudArray[cloudCount];
 struct Star starArray[starCount];
 struct Background skyline;
 
-// This method returns a boolean solid/not solid for the foreground
-// and takes x/y co-ords as parameters.
-
-//bool getSolid(short x, short y){
-//  x/=8;y/=8;
-//  if(y>7 || y<0){return false;}
-//  char temp = pgm_read_byte( & (levelMap[y][x]) );
-//  if(temp>0){return true;}
-//  return false;
-//}
-
-
-signed char getTileType(short x, signed char y){
-  x/=8;y/=8;
+signed char getTileType(short x, signed char y, bool divide){
+  if(divide){x/=8;y/=8;}
   char temp;
+//        temp = pgm_read_byte(&(levelMap0[y][x+arrayX]));
+
   switch(levelCount){
     case 0: temp = pgm_read_byte(&(levelMap0[y][x]));break;
     case 1: temp = pgm_read_byte(&(levelMap1[y][x]));break;
@@ -129,16 +120,15 @@ signed char getTileType(short x, signed char y){
 
 bool getSolid(short x, signed char y){
   if(y/8>7 || y/8<0 || x<0){return false;}
-  char temp = getTileType(x,y);
+  if(x<0 || x>(levelWidth*8)){return true;}
+
+  char temp = getTileType(x,y, 1);
   if(temp>0){return true;}
   return false;
 }
 
-bool getCoinBox(short x, short y){
-  x/=8;
-  y/=8;
-
-  char temp = pgm_read_byte( & (levelMap0[y][x]) );
+bool getCoinBox(short x, byte y){
+  char temp = getTileType(x, y, 1);
 
   if(temp==3){
     return true;

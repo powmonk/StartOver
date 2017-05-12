@@ -84,16 +84,17 @@ if(badMan.alive && !levelComplete){
     
     // UP button. Doesn't really do anything too specific. Goes through doors.
     if(arduboy.pressed(UP_BUTTON)){
+//      levelComplete = true;
       badMan.crouching = false;
       if(badMan.frame == 5 && badMan.alive){
         badMan.frame = 0;
       }
-      if(doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5) == -3){
+      if(doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5, 1) == -3){
         levelComplete = true;
       }
     }
 
-    if(arduboy.pressed(UP_BUTTON) && doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5) == -3){
+    if(arduboy.pressed(UP_BUTTON) && doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5, 1) == -3){
               levelComplete = true;
 
     }
@@ -239,13 +240,12 @@ if(badMan.alive && !levelComplete){
       arduboy.drawBitmap(10,gameOverY, wellDone,   111, 16, 1);
     }
   }
-  if(badMan.y+16>=78 || getTileType((badMan.x+3)-levelX,badMan.y+16) == 4){
-//    badMan.frame = 6;
+  if(badMan.y+16>=78 || getTileType((badMan.x+3)-levelX,badMan.y+16, 1) == 4){
     badMan.alive = false;
     playDeadTone();
   }
 
-  if(coinsCollected == coinCount ){
+  if(coinsCollected == totalCoins ){
     doorOpen = 1;
   }
 

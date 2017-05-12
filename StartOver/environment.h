@@ -15,7 +15,7 @@ void droplet(byte x, byte y){
 void rain(){
   rainSize = random(showerSize);
 
-  wind = arduboy.everyXFrames(500)?1-random(2):wind;
+  wind = arduboy.everyXFrames(350)?1-random(2):wind;
   
   if(initTrigger){
      for(byte i=0;i<rainSize;i++){
@@ -153,40 +153,55 @@ void drawSkyline(){
 void countShit(){
   coinCount = 0;
   boxCount  = 0;
+  //char temp;
   
+  switch(levelCount){
+    case 0: levelWidth = sizeof(levelMap0[7]);break;
+    case 1: levelWidth = sizeof(levelMap1[7]);break;
+  }
+
   for(short x=0;x<levelWidth;x++){
     for(char y=0;y<levelHeight;y++){
-      char temp = pgm_read_byte(&(levelMap0[y][x]));
+      char temp = getTileType(x, y, 0);
+      // char temp = pgm_read_byte(&(levelMap0[y][x]));
       if(temp == -1){
+        coins[coinCount].x=x;
+        coins[coinCount].y=y;
+        coins[coinCount].collected=false;
         coinCount++;
+
       }
       if(temp == 3){
+        boxes[boxCount].x=x;
+        boxes[boxCount].y=y;
+        boxes[boxCount].hit=false;
         boxCount++;
       }
     }
   }
-  
-  byte tmpCoinCount = coinCount;
-  byte tmpBoxCount = boxCount;
-  for(short x=levelWidth;x>-1;x--){
-    for(char y=levelHeight;y>-1;y--){
-      char temp = pgm_read_byte(&(levelMap0[y][x]));
-      if(temp == -1){
-        tmpCoinCount--;
-        coins[tmpCoinCount].x=x;
-        coins[tmpCoinCount].y=y;
-        coins[tmpCoinCount].collected=false;
-      }
-      if(temp == 3){
-        tmpBoxCount--;
-        boxes[tmpBoxCount].x=x;
-        boxes[tmpBoxCount].y=y;
-        boxes[tmpBoxCount].hit=false;
-      }
-    }
-  }
 
-  coinCount+=boxCount;
+  totalCoins = coinCount + boxCount;
+  
+//  for(short x=levelWidth;x>-1;x--){
+//    for(char y=levelHeight;y>-1;y--){
+//       //char temp = getTileType(x,y,0);
+//      char temp = pgm_read_byte(&(levelMap0[y][x]));
+//      if(temp == -1){
+//        coinCount--;
+//        coins[coinCount].x=x;
+//        coins[coinCount].y=y;
+//        coins[coinCount].collected=false;
+//      }
+////      if(temp == 3){
+////        boxCount--;
+////        boxes[boxCount].x=x;
+////        boxes[boxCount].y=y;
+////        boxes[boxCount].hit=false;
+//      }
+//    }
+//  //}
+
+//  coinCount+=boxCount;
 }
 
 bool drawBox(short x, byte y){
@@ -202,7 +217,6 @@ void drawDoor(short x, byte y){
   }else{
     sprites.drawOverwrite(x,y,door,2+flick);
   }
-  
 }
 
 void drawLevel(){
@@ -212,10 +226,13 @@ void drawLevel(){
 
   drawSkyline();
 
-  char temp;
+//  char temp;
   for(char x=0;x<17;x++){
     for(char y=0;y<8;y++){
-      getTileType(x+arrayX, y);
+        char temp = getTileType(x+arrayX, y, 0);
+//      temp = pgm_read_byte(&(levelMap0[y][x+arrayX]));
+
+
       switch(temp){
         case -3: drawDoor(levelX+((x+arrayX)*8),y*8);break;
         case -2: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile1,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;
@@ -224,20 +241,14 @@ void drawLevel(){
         case  0: break;
         case  1: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile0,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;
         case  2: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile1,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;
-        case  3: 
-        
-        if(boxCheck(x+arrayX,y,0)){
-        
-          arduboy.fillRect(levelX+((x+arrayX)*8)+1,y*8+1,6,6,0);
-          arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,coinBox,8,8,1);
-        }else{
-          arduboy.fillRect(levelX+((x+arrayX)*8)+1,y*8+1,6,6,1);
-          arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,deadBox,8,8,0);
-        }
-        
-        break;
-        
-        
+        case  3:  if(boxCheck(x+arrayX,y,0)){
+                    arduboy.fillRect(levelX+((x+arrayX)*8)+1,y*8+1,6,6,0);
+                    arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,coinBox,8,8,1);
+                  }else{
+                    arduboy.fillRect(levelX+((x+arrayX)*8)+1,y*8+1,6,6,1);
+                    arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,deadBox,8,8,0);
+                  }
+                  break;
         case  4: sprites.drawSelfMasked(levelX+((x+arrayX)*8),y*8,spike,flick);break;
         case  5: sprites.drawSelfMasked(levelX+((x+arrayX)*8)-1,y*8,pipe,flick);break;
         
