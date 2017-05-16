@@ -14,25 +14,17 @@
 void setup() {
   Serial.begin(9600);
   levelX=0;
-  coinCount = 0;
-  coinsCollected = 0;
-
-
   // initiate arduboy instance
   if(initTrigger){
     arduboy.begin();
   }else{
     arduboy.boot();
   }
-  
   countShit();
   playerInit();
   baddieInit();
-    
-//  playerInit();
-  
   // default 60 > saves battery
-  arduboy.setFrameRate(45);
+  arduboy.setFrameRate(40);
 }
 
 // our main game loop, this runs once every cycle/frame.
@@ -54,29 +46,36 @@ void loop() {
   flick = !flick;
   arduboy.pollButtons();
 
+//  arduboy.setCursor(0,0);
+//  arduboy.print(levelWidth);
+
+  if(levelCount%2==0){
+    arduboy.setCursor(120,1);
+    arduboy.print(coinsCollected);
+    coinRotate(112,2);
+
+
+  }
   stars();
-
   drawSunMoon();
-
   clouds();
+
 
   drawLevel();
 
-  drawGoons();
+  if(levelCount%2==0)drawGoons();
 
   handleInput();
 
   drawPlayer();
 
-  rain();
+  if(levelCount%2==0)rain();
 
   levelX = levelX>0?0:levelX;
   levelX = levelX < 0-(levelWidth*8)+128 ? 0-(levelWidth*8)+128 : levelX;  
 
   initTrigger = 0;
 
-//    arduboy.setCursor(0,0);
-//  arduboy.print();
 
 
   Serial.write(arduboy.getBuffer(), 128 * 64 / 8);

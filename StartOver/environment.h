@@ -153,7 +153,8 @@ void drawSkyline(){
 void countShit(){
   coinCount = 0;
   boxCount  = 0;
-  //char temp;
+  coinsCollected = 0;
+
   
   switch(levelCount){
     case 0: levelWidth = sizeof(levelMap0[7]);break;
@@ -222,18 +223,18 @@ void drawDoor(short x, byte y){
 void drawLevel(){
   signed short arrayX = levelX / -8;
 
-  sprites.drawSelfMasked(0,-22,sky, flick);
+//  if(levelCount%2==0){
+    sprites.drawSelfMasked(0,-22,sky, flick);
+    drawSkyline();
+//  }
 
-  drawSkyline();
 
-//  char temp;
   for(char x=0;x<17;x++){
     for(char y=0;y<8;y++){
-        char temp = getTileType(x+arrayX, y, 0);
-//      temp = pgm_read_byte(&(levelMap0[y][x+arrayX]));
-
+      char temp = getTileType(x+arrayX, y, 0);
 
       switch(temp){
+        case -4: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,wallTile,flick);break;
         case -3: drawDoor(levelX+((x+arrayX)*8),y*8);break;
         case -2: sprites.drawOverwrite(levelX+((x+arrayX)*8),y*8,floorTile1,0);if(flick)arduboy.drawBitmap(levelX+((x+arrayX)*8),y*8,blankTile0,8,8,1);break;
         case -1: if(coinCheck(x+arrayX,y,0))coinRotate(levelX+(x+arrayX)*8,y*8);break;
@@ -255,19 +256,30 @@ void drawLevel(){
       }
     }
   }
-  drawStreetLight(levelWidth*8 / 4 * 1);
-  drawStreetLight(levelWidth*8 / 4 * 2);
-  drawStreetLight(levelWidth*8 / 4 * 3);
-//  drawStreetLight(levelWidth*8 / 4 * 4);
+  if(levelCount % 2 == 0){
+    drawStreetLight(levelWidth*8 / 4 * 1);
+    drawStreetLight(levelWidth*8 / 4 * 2);
+    drawStreetLight(levelWidth*8 / 4 * 3);
+  //  drawStreetLight(levelWidth*8 / 4 * 4);
+  }
+  
+  if(levelCount % 2 != 0){
+//    sprites.drawSelfMasked(40,16,classyFuckinPainting, flick);
+    arduboy.fillRect(60,16, 32, 24, 0);
+    sprites.drawSelfMasked(60, 16, classyfuckingpicture, flick); 
+    arduboy.drawBitmap(60, 16, classyfuckingpicture_mask, 32, 24, 0);
+  }
 }
 
 void drawSunMoon(){
-  arduboy.fillCircle((levelX/8)+260,15, 12, 1);
+  short xPos = (levelWidth+15)+(levelX/8);
+  
+  arduboy.fillCircle(xPos,15, 12, 1);
 
-  arduboy.fillCircle((levelX/8)+254,12, 11, 0);
+  arduboy.fillCircle(xPos-6,12, 11, 0);
 
   if(arduboy.everyXFrames(2))
-  arduboy.fillCircle((levelX/8)+260,15, 12, flick);
+  arduboy.fillCircle(xPos,15, 12, flick);
 }
 
 

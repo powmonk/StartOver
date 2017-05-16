@@ -84,7 +84,6 @@ if(badMan.alive && !levelComplete){
     
     // UP button. Doesn't really do anything too specific. Goes through doors.
     if(arduboy.pressed(UP_BUTTON)){
-//      levelComplete = true;
       badMan.crouching = false;
       if(badMan.frame == 5 && badMan.alive){
         badMan.frame = 0;
@@ -96,7 +95,6 @@ if(badMan.alive && !levelComplete){
 
     if(arduboy.pressed(UP_BUTTON) && doorOpen == true && getTileType(badMan.x+3-levelX, badMan.y+5, 1) == -3){
               levelComplete = true;
-
     }
   
     // Crouching
@@ -166,9 +164,6 @@ if(badMan.alive && !levelComplete){
 //    sprites.drawSelfMasked(0,1,coinAnim, 1);
 //    arduboy.setCursor(6,0);
 //    arduboy.print("=");
-    arduboy.setCursor(124,1);
-    arduboy.print(coinsCollected);
-    coinRotate(116,2);
 
 //    arduboy.print(boxCount);
 
@@ -177,11 +172,21 @@ if(badMan.alive && !levelComplete){
       badMan.x +=badMan.xSpeed;
     }
     
-    if(arduboy.pressed(B_BUTTON) && !badMan.jumpCooldown && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
-      badMan.jumping = true;
-      badMan.jumpCooldown = true;
-      playJumpTone();
-      badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
+    if(levelCount%2 == 0){
+      if(arduboy.pressed(B_BUTTON) && !badMan.jumpCooldown && !badMan.jumping && !badMan.falling && !badMan.crouching && getSolid((badMan.x+3)-levelX, badMan.y+17)){
+        badMan.jumping = true;
+        badMan.jumpCooldown = true;
+        playJumpTone();
+        badMan.ceiling = badMan.y - 30 > -20?badMan.y - 30:-20;
+      }
+    }else{
+      if(arduboy.pressed(B_BUTTON) && !BMSpear.alive){
+        spearInit();
+      }
+    }
+
+    if(BMSpear.alive){
+      launchSpear();
     }
   
     if(badMan.jumping && !badMan.falling && !badMan.crouching){
@@ -195,7 +200,6 @@ if(badMan.alive && !levelComplete){
 
     if(arduboy.justReleased(B_BUTTON)){
       badMan.jumpCooldown = false;
-      
     }
   }else{
     if(!badMan.alive){
@@ -229,6 +233,7 @@ if(badMan.alive && !levelComplete){
         gameOverY--;
       }else{
         if(arduboy.pressed(B_BUTTON) || arduboy.pressed(A_BUTTON)){
+          doorOpen=0;
           levelComplete = 0;
           levelCount++;
           gameOverY = 70;
@@ -245,9 +250,14 @@ if(badMan.alive && !levelComplete){
     playDeadTone();
   }
 
-  if(coinsCollected == totalCoins ){
+  if(coinsCollected == totalCoins && levelCount % 2 == 0){
     doorOpen = 1;
   }
+
+  if(coinsCollected == totalCoins && levelCount % 2 == 0){
+    doorOpen = 1;
+  }
+
 
 }
 

@@ -83,6 +83,38 @@ struct Box{
   bool  hit;
 };
 
+struct Spear{
+  byte x;
+  float y;
+  bool alive;
+};
+
+struct Bubble{
+  byte x;
+  byte y;
+  byte size;
+  bool xDirection;
+  bool yDirection;
+  bool alive;
+  struct Rect hitBox[3];
+};
+
+struct Bubble bubbles[4];
+
+void bubbleInit(){
+  for(byte i=0;i<sizeof(bubbles);i++){
+    bubble[i].alive = false;
+  }
+}
+
+void newBubble(struct Bubble, byte bubbleSize){
+  bubble[0].size        = 10;
+  bubble[0].xDirection  = 1;
+  bubble[0].yDirection  = 0;
+  bubble[0].alive       = 1;
+
+}
+
 struct Coin coins[10];
 
 struct Box boxes[10];
@@ -119,8 +151,8 @@ signed char getTileType(short x, signed char y, bool divide){
 }
 
 bool getSolid(short x, signed char y){
-  if(y/8>7 || y/8<0 || x<0){return false;}
-  if(x<0 || x>(levelWidth*8)){return true;}
+  if(y/8>7 || y/8<0){return false;}
+  if(x<1 || x>(levelWidth*8)){return true;}
 
   char temp = getTileType(x,y, 1);
   if(temp>0){return true;}
@@ -149,7 +181,6 @@ struct Player{
   bool  jumping;
   bool  jumpCooldown;
   bool  crouching;
-  
 };
 
 struct Player badMan;
@@ -157,15 +188,14 @@ struct Rect   badManHit;
 struct Point  badManKill;
 
 void playerInit(){
-  badMan.x            = 20;
-  badMan.y            = 0;
-  badMan.frame        = 0;
-  badMan.xDirection   = 1;
-  badMan.falling      = true;
-  badMan.jumping      = false;
-  badMan.jumpCooldown = false;
-  badMan.alive        = true;
-  
+  badMan.x             = 20;
+  badMan.y             = 0;
+  badMan.frame         = 0;
+  badMan.xDirection    = 1;
+  badMan.falling       = true;
+  badMan.jumping       = false;
+  badMan.jumpCooldown  = false;
+  badMan.alive         = true;
 }
 
 void drawPlayer(){
@@ -371,6 +401,56 @@ bool boxCheck(int x, char y, bool hit){
   }
   return false;
 }
+
+struct Spear BMSpear;
+
+void spearInit(){
+  BMSpear.alive = true;
+  BMSpear.x = badMan.x +3;
+  BMSpear.y = badMan.y +8;
+
+}
+
+void launchSpear(){
+  if(BMSpear.alive){
+    BMSpear.y-=1.3;
+    sprites.drawSelfMasked(BMSpear.x-2,BMSpear.y, spearTip, 0);
+    for(byte i=7;i<56;i+=8){
+      sprites.drawSelfMasked(BMSpear.x-1,BMSpear.y+i, rope, 0);
+    }
+  }
+
+  if(BMSpear.y<=-4){
+    BMSpear.alive = false;
+  }
+}
+
+
+//void drawShape(){
+//  int size = 10;
+//  
+//  if(x==128-size){
+//    flipX=false;
+//  }else if(x==0+size){
+//    flipX=true;
+//  }
+//  x = flipX?x+=1:x-=1;
+//
+//  if(y==48-size){
+//    flipY=false;
+//  }else if(y==0+size){
+//    flipY=true;
+//  }
+//  y = flipY?y+=1:y-=1;
+//  
+//  arduboy.fillCircle(x, y, size, BLACK);
+//  arduboy.drawCircle(x, y, size, WHITE);
+//  arduboy.fillCircle(x-2,y-2, size/2, WHITE);
+//  arduboy.fillCircle(x,y, size/1.5, BLACK);
+//  if(flick){arduboy.fillCircle(x, y, size, WHITE);}
+//
+//
+//}
 
 #endif
 
