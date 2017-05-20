@@ -39,6 +39,8 @@ signed char wind=0-2;
 byte coinsCollected=0;
 byte totalCoins;
 byte levelCount = 0;
+byte bubbleInitSize = 18;
+const byte MAX_BUBS = 10;
 
 void playCoinTone(){
 //  sound.tone(3087, 100,4120, 250);
@@ -87,33 +89,65 @@ struct Spear{
   byte x;
   float y;
   bool alive;
+  struct Rect spear;
 };
 
 struct Bubble{
   byte x;
   byte y;
-  byte size;
+  byte bubbleSize;
   bool xDirection;
   bool yDirection;
   bool alive;
-  struct Rect hitBox[3];
+  struct Rect hitBox;
 };
 
-struct Bubble bubbles[4];
+struct Bubble bubbles[MAX_BUBS];
+
+
+void newBubble(byte arrayPos, byte bubbleSize, bool xDir, byte x, byte y){
+  bubbles[arrayPos].bubbleSize  = bubbleSize;
+  bubbles[arrayPos].xDirection  = xDir;
+  bubbles[arrayPos].yDirection  = 1;
+  bubbles[arrayPos].alive       = 1;
+  bubbles[arrayPos].x           = x;
+  bubbles[arrayPos].y           = y;
+}
 
 void bubbleInit(){
-  for(byte i=0;i<sizeof(bubbles);i++){
-    bubble[i].alive = false;
+  for(byte i=0;i<MAX_BUBS;i++){
+    bubbles[i].alive = false;
   }
+  newBubble(0, bubbleInitSize, 1, 64, 32);
 }
 
-void newBubble(struct Bubble, byte bubbleSize){
-  bubble[0].size        = 10;
-  bubble[0].xDirection  = 1;
-  bubble[0].yDirection  = 0;
-  bubble[0].alive       = 1;
 
-}
+//void drawShape(){
+//  int size = 10;
+//  
+//  if(x==128-size){
+//    flipX=false;
+//  }else if(x==0+size){
+//    flipX=true;
+//  }
+//  x = flipX?x+=1:x-=1;
+//
+//  if(y==48-size){
+//    flipY=false;
+//  }else if(y==0+size){
+//    flipY=true;
+//  }
+//  y = flipY?y+=1:y-=1;
+//  
+//  arduboy.fillCircle(x, y, size, BLACK);
+//  arduboy.drawCircle(x, y, size, WHITE);
+//  arduboy.fillCircle(x-2,y-2, size/2, WHITE);
+//  arduboy.fillCircle(x,y, size/1.5, BLACK);
+//  if(flick){arduboy.fillCircle(x, y, size, WHITE);}
+//
+//
+//}
+
 
 struct Coin coins[10];
 
@@ -143,9 +177,9 @@ signed char getTileType(short x, signed char y, bool divide){
   char temp;
 //        temp = pgm_read_byte(&(levelMap0[y][x+arrayX]));
 
-  switch(levelCount){
+  switch(levelCount%2){
     case 0: temp = pgm_read_byte(&(levelMap0[y][x]));break;
-    case 1: temp = pgm_read_byte(&(levelMap1[y][x]));break;
+    default: temp = pgm_read_byte(&(levelMap1[y][x]));break;
   }
   return temp;
 }
@@ -415,6 +449,10 @@ void launchSpear(){
   if(BMSpear.alive){
     BMSpear.y-=1.3;
     sprites.drawSelfMasked(BMSpear.x-2,BMSpear.y, spearTip, 0);
+    BMSpear.spear.x      = BMSpear.x-1;
+    BMSpear.spear.y      = BMSpear.y;
+    BMSpear.spear.width  = 1;
+    BMSpear.spear.height = 56;
     for(byte i=7;i<56;i+=8){
       sprites.drawSelfMasked(BMSpear.x-1,BMSpear.y+i, rope, 0);
     }
@@ -422,35 +460,85 @@ void launchSpear(){
 
   if(BMSpear.y<=-4){
     BMSpear.alive = false;
+    BMSpear.spear.y = 64;
+
   }
 }
 
+void drawBubbles(){
+  for(byte i = 0;i<MAX_BUBS;i++){
+    byte radius = bubbles[i].bubbleSize;
 
-//void drawShape(){
-//  int size = 10;
-//  
-//  if(x==128-size){
-//    flipX=false;
-//  }else if(x==0+size){
-//    flipX=true;
-//  }
-//  x = flipX?x+=1:x-=1;
-//
-//  if(y==48-size){
-//    flipY=false;
-//  }else if(y==0+size){
-//    flipY=true;
-//  }
-//  y = flipY?y+=1:y-=1;
-//  
-//  arduboy.fillCircle(x, y, size, BLACK);
-//  arduboy.drawCircle(x, y, size, WHITE);
-//  arduboy.fillCircle(x-2,y-2, size/2, WHITE);
-//  arduboy.fillCircle(x,y, size/1.5, BLACK);
-//  if(flick){arduboy.fillCircle(x, y, size, WHITE);}
-//
-//
-//}
+    if(bubbles[i].alive == true){
+      arduboy.fillCircle(bubbles[i].x, bubbles[i].y, bubbles[i].bubbleSize, BLACK);
+      arduboy.fillCircle(bubbles[i].x, bubbles[i].y, bubbles[i].bubbleSize/2, BLACK);
+      arduboy.drawCircle(bubbles[i].x, bubbles[i].y, bubbles[i].bubbleSize, WHITE);
+      arduboy.fillCircle(bubbles[i].x-2,bubbles[i].y-2, bubbles[i].bubbleSize/2, WHITE);
+      arduboy.fillCircle(bubbles[i].x,bubbles[i].y, bubbles[i].bubbleSize/1.5, BLACK);
+//      if(!flick){arduboy.fillCircle(bubbles[i].x, bubbles[i].y, bubbles[i].bubbleSize, WHITE);}
+      
+//      arduboy.fillRect(bubbles[i].x-radius/1.4,bubbles[i].y-radius/1.4, bubbles[i].bubbleSize*1.58, bubbles[i].bubbleSize*1.58, WHITE);
+      bubbles[i].hitBox.x      = bubbles[i].x-radius/1.4,
+      bubbles[i].hitBox.y      = bubbles[i].y-radius/1.4,
+      bubbles[i].hitBox.width  = bubbles[i].bubbleSize*1.58, 
+      bubbles[i].hitBox.height = bubbles[i].bubbleSize*1.58;
+    }
+
+    if(bubbles[i].xDirection){
+      bubbles[i].x++;
+    }else{
+      bubbles[i].x--;
+    }
+
+    if(bubbles[i].yDirection){
+      bubbles[i].y++;
+    }else{
+      bubbles[i].y--;
+    }
+
+
+    if(bubbles[i].x >= 128 - radius || bubbles[i].x <= radius){
+      bubbles[i].xDirection=!bubbles[i].xDirection;
+    }
+
+    if(bubbles[i].y >= 56 - radius || bubbles[i].y <= radius){
+      bubbles[i].yDirection=!bubbles[i].yDirection;
+    }
+
+    if(arduboy.collide(bubbles[i].hitBox, badManHit) && bubbles[i].alive){
+      badMan.alive = false;
+    }
+
+    if(arduboy.collide(bubbles[i].hitBox, BMSpear.spear) && bubbles[i].alive){
+      byte loopCount=0;
+      for(byte j = 0; j<MAX_BUBS;j++){
+        if(!bubbles[j].alive){
+          if(bubbles[i].bubbleSize /1.7 > 2 && loopCount<2){
+            newBubble(j, bubbles[i].bubbleSize /1.7, loopCount, bubbles[i].x, bubbles[i].y);
+            loopCount++;
+          }          
+        }
+      }
+//      newBubble(byte arrayPos, byte bubbleSize, bool xDir, byte x, byte y)
+      bubbles[i].alive = false;
+      BMSpear.alive = false;
+      BMSpear.spear.y = 64;
+    }
+    
+  }
+//  arduboy.setCursor(0,0);
+//  arduboy.print(sizeof(bubbles));
+}
+
+boolean noBubbles(){
+  for(byte j = 0; j<MAX_BUBS;j++){
+    if(bubbles[j].alive)
+      return false;
+  }
+
+  return true;
+}
+
 
 #endif
 

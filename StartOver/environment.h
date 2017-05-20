@@ -156,9 +156,9 @@ void countShit(){
   coinsCollected = 0;
 
   
-  switch(levelCount){
+  switch(levelCount%2){
     case 0: levelWidth = sizeof(levelMap0[7]);break;
-    case 1: levelWidth = sizeof(levelMap1[7]);break;
+    default: levelWidth = sizeof(levelMap1[7]);break;
   }
 
   for(short x=0;x<levelWidth;x++){
@@ -263,12 +263,12 @@ void drawLevel(){
   //  drawStreetLight(levelWidth*8 / 4 * 4);
   }
   
-  if(levelCount % 2 != 0){
-//    sprites.drawSelfMasked(40,16,classyFuckinPainting, flick);
-    arduboy.fillRect(60,16, 32, 24, 0);
-    sprites.drawSelfMasked(60, 16, classyfuckingpicture, flick); 
-    arduboy.drawBitmap(60, 16, classyfuckingpicture_mask, 32, 24, 0);
-  }
+//  if(levelCount % 2 != 0){
+////    sprites.drawSelfMasked(40,16,classyFuckinPainting, flick);
+//    arduboy.fillRect(60,16, 32, 24, 0);
+//    sprites.drawSelfMasked(60, 16, classyfuckingpicture, flick); 
+//    arduboy.drawBitmap(60, 16, classyfuckingpicture_mask, 32, 24, 0);
+//  }
 }
 
 void drawSunMoon(){

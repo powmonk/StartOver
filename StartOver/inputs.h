@@ -84,6 +84,8 @@ if(badMan.alive && !levelComplete){
     
     // UP button. Doesn't really do anything too specific. Goes through doors.
     if(arduboy.pressed(UP_BUTTON)){
+//      This is my cheat for testing purposes
+//      levelComplete = true;
       badMan.crouching = false;
       if(badMan.frame == 5 && badMan.alive){
         badMan.frame = 0;
@@ -221,6 +223,7 @@ if(badMan.alive && !levelComplete){
       if(arduboy.pressed(B_BUTTON) && !deadBool && gameOverY==10){
         gameOverY = 70;
         setup();
+//        bubbleInit();
         initTrigger = 1;
       }
   
@@ -254,7 +257,7 @@ if(badMan.alive && !levelComplete){
     doorOpen = 1;
   }
 
-  if(coinsCollected == totalCoins && levelCount % 2 == 0){
+  if(noBubbles() && levelCount % 2 != 0){
     doorOpen = 1;
   }
 

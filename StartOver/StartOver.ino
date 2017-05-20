@@ -23,6 +23,8 @@ void setup() {
   countShit();
   playerInit();
   baddieInit();
+  bubbleInit();
+
   // default 60 > saves battery
   arduboy.setFrameRate(40);
 }
@@ -40,7 +42,6 @@ void loop() {
   if(initTrigger){
 
     playerInit();
-    
   }
 
   flick = !flick;
@@ -55,7 +56,8 @@ void loop() {
     coinRotate(112,2);
 
 
-  }
+  } 
+  
   stars();
   drawSunMoon();
   clouds();
@@ -63,13 +65,19 @@ void loop() {
 
   drawLevel();
 
-  if(levelCount%2==0)drawGoons();
+  if(levelCount%2==0){
+    drawGoons();
+  }else{
+    drawBubbles();
+  }
 
   handleInput();
 
   drawPlayer();
 
-  if(levelCount%2==0)rain();
+  if(levelCount%2==0){
+    rain();
+  }
 
   levelX = levelX>0?0:levelX;
   levelX = levelX < 0-(levelWidth*8)+128 ? 0-(levelWidth*8)+128 : levelX;  
